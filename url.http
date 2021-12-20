@@ -1,0 +1,11 @@
+### get by id
+
+GET http://localhost:8080/mqG7jEAvu28AyRUK3LoAEL
+
+### create
+
+POST http://localhost:8080
+
+{
+    "long_url": "https://facebook.com"
+}
