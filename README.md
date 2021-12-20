@@ -25,3 +25,9 @@ Using Go
         "status": "success"
     }
     ```
+
+## Architecture
+
+Using layered architecture, introduced by Uncle Bob
+
+`controller -> service -> repository`
