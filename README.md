@@ -26,6 +26,16 @@ Using Go
     }
     ```
 
+## Tech
+
+*|Tech
+-----|-----
+Web|github.com/gin-gonic/gin
+Database|Sqlite
+ORM|gorm.io/gorm
+Id Generator|github.com/lithammer/shortuuid/v3
+
+
 ## Architecture
 
 Using layered architecture, introduced by Uncle Bob
