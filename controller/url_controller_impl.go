@@ -23,7 +23,7 @@ func NewUrlController(urlService service.UrlService) UrlController {
 
 func (c *urlController) Route(router *gin.Engine) {
 	router.POST("/", c.Create)
-	router.GET("/:id", c.GetLongUrl)
+	router.GET("/:id", c.FindById)
 }
 
 func (c *urlController) Create(ctx *gin.Context) {
@@ -46,15 +46,15 @@ func (c *urlController) Create(ctx *gin.Context) {
 	})
 }
 
-func (c *urlController) GetLongUrl(ctx *gin.Context) {
+func (c *urlController) FindById(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	longUrl := c.UrlService.GetLongUrl(id)
+	longUrl := c.UrlService.FindById(id)
 
-	ctx.Redirect(http.StatusMovedPermanently, longUrl)
+	// ctx.Redirect(http.StatusMovedPermanently, longUrl)
 
-	// ctx.JSON(http.StatusCreated, gin.H{
-	// 	"status":   "success",
-	// 	"long_url": longUrl,
-	// })
+	ctx.JSON(http.StatusCreated, gin.H{
+		"status":   "success",
+		"long_url": longUrl,
+	})
 }

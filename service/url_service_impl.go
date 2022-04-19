@@ -17,13 +17,13 @@ func NewUrlService(urlRepository repository.UrlRepository) UrlService {
 }
 
 func (s *urlService) Create(url entity.Url) string {
-	err := s.UrlRepository.Insert(url)
+	err := s.UrlRepository.Create(url)
 	exception.PanicIfNeeded(err)
 	shortUrl := "http:localhost:8080/" + url.Id
 	return shortUrl
 }
 
-func (s *urlService) GetLongUrl(id string) string {
+func (s *urlService) FindById(id string) string {
 	url, err := s.UrlRepository.FindById(id)
 	exception.PanicIfNeeded(err)
 	return url.LongUrl
