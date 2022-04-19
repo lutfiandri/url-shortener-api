@@ -23,7 +23,7 @@ func (s *urlService) Create(url entity.Url) string {
 	return shortUrl
 }
 
-func (s *urlService) GetLongUrl(id string) string {
+func (s *urlService) FindById(id string) string {
 	url, err := s.UrlRepository.FindById(id)
 	exception.PanicIfNeeded(err)
 	return url.LongUrl
