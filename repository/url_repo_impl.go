@@ -35,7 +35,7 @@ func (r *urlRepository) FindByUser(userId string) ([]entity.Url, error) {
 	return urls, err
 }
 
-func (r *urlRepository) Insert(url entity.Url) error {
+func (r *urlRepository) Create(url entity.Url) error {
 	err := r.db.Create(&url).Error
 	return err
 }
