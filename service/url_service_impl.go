@@ -19,7 +19,7 @@ func NewUrlService(urlRepository repository.UrlRepository) UrlService {
 func (s *urlService) Create(url entity.Url) string {
 	err := s.UrlRepository.Create(url)
 	exception.PanicIfNeeded(err)
-	shortUrl := "http:localhost:8080/" + url.Id
+	shortUrl := "http://localhost:8080/" + url.Id
 	return shortUrl
 }
 
