@@ -45,6 +45,6 @@ func (r *urlRepository) DeleteById(id string) error {
 	return err
 }
 
-func (r *urlRepository) AutoMigrate() {
-	r.db.AutoMigrate()
-}
+// func (r *urlRepository) AutoMigrate() {
+// 	r.db.AutoMigrate()
+// }

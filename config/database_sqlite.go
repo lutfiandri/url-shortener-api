@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewSqliteDatabase() *gorm.DB {
-	db, err := gorm.Open(sqlite.Open("url.db"), &gorm.Config{})
+func NewSqliteDatabase(location string) *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(location), &gorm.Config{})
 	exception.PanicIfNeeded(err)
 	return db
 }

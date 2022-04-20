@@ -10,19 +10,10 @@ import (
 )
 
 func main() {
-	database := config.NewSqliteDatabase()
+	database := config.NewSqliteDatabase(".data/url-shortener.db")
 	urlRepository := repository.NewUrlRepository(database)
 	urlService := service.NewUrlService(urlRepository)
 	urlController := controller.NewUrlController(urlService)
-	// url := entity.Url{
-	// 	Id:      shortuuid.New(),
-	// 	LongUrl: "https://google.com",
-	// 	UserId:  shortuuid.New(),
-	// }
-	// fmt.Println(urlService.Create(url))
-	// // // err := urlRepository.Insert(url)
-	// // // exception.PanicIfNeeded(err)
-	// // // fmt.Println(url.Id)
 
 	r := gin.Default()
 	urlController.Route(r)
