@@ -25,11 +25,6 @@ func (s *urlService) FindById(id string) (entity.Url, error) {
 	return url, err
 }
 
-func (s *urlService) FindByUserId(userId string) ([]entity.Url, error) {
-	urls, err := s.UrlRepository.FindByUserId(userId)
-	return urls, err
-}
-
 func (s *urlService) Create(url entity.Url) error {
 	err := s.UrlRepository.Create(url)
 	return err

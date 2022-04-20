@@ -31,12 +31,6 @@ func (r *urlRepository) FindById(id string) (entity.Url, error) {
 	return url, err
 }
 
-func (r *urlRepository) FindByUserId(userId string) ([]entity.Url, error) {
-	var urls []entity.Url
-	err := r.db.Find(&urls, "user_id = ?", userId).Error
-	return urls, err
-}
-
 func (r *urlRepository) Create(url entity.Url) error {
 	err := r.db.Create(&url).Error
 	return err
@@ -52,7 +46,3 @@ func (r *urlRepository) DeleteById(id string) error {
 	}
 	return nil
 }
-
-// func (r *urlRepository) AutoMigrate() {
-// 	r.db.AutoMigrate()
-// }

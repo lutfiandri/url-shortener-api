@@ -29,7 +29,6 @@ func (c *urlController) Route(router *gin.Engine) {
 	router.GET("/:id", c.FindByIdAndRedirect)
 	router.GET("/urls/", c.FindAll)
 	router.GET("/urls/:id", c.FindById)
-	router.GET("/urls/by/:userId", c.FindByUserId)
 	router.POST("/urls/", c.Create)
 	router.DELETE("/urls/:id", c.DeleteById)
 }
@@ -56,7 +55,18 @@ func (c *urlController) FindAll(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, urls)
+	responses := make([]model.UrlResponse, len(urls))
+
+	for i, url := range urls {
+		responses[i] = model.UrlResponse{
+			Id:       url.Id,
+			ShortUrl: c.env.BaseUrl + "/" + url.Id,
+			LongUrl:  url.LongUrl,
+			Title:    url.Title,
+		}
+	}
+
+	ctx.JSON(http.StatusOK, responses)
 }
 
 func (c *urlController) FindById(ctx *gin.Context) {
@@ -75,20 +85,8 @@ func (c *urlController) FindById(ctx *gin.Context) {
 		Id:       url.Id,
 		ShortUrl: c.env.BaseUrl + "/" + url.Id,
 		LongUrl:  url.LongUrl,
-		UserId:   url.UserId,
+		Title:    url.Title,
 	})
-}
-
-func (c *urlController) FindByUserId(ctx *gin.Context) {
-	userId := ctx.Param("userId")
-
-	urls, err := c.UrlService.FindByUserId(userId)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-
-	ctx.JSON(http.StatusOK, urls)
 }
 
 func (c *urlController) Create(ctx *gin.Context) {
@@ -102,6 +100,7 @@ func (c *urlController) Create(ctx *gin.Context) {
 	url := entity.Url{
 		Id:      shortuuid.New(),
 		LongUrl: request.LongUrl,
+		Title:   request.Title,
 	}
 
 	err = c.UrlService.Create(url)
@@ -114,7 +113,7 @@ func (c *urlController) Create(ctx *gin.Context) {
 		Id:       url.Id,
 		ShortUrl: c.env.BaseUrl + "/" + url.Id,
 		LongUrl:  url.LongUrl,
-		UserId:   url.UserId,
+		Title:    url.Title,
 	})
 }
 
@@ -122,6 +121,11 @@ func (c *urlController) DeleteById(ctx *gin.Context) {
 	id := ctx.Param("id")
 	err := c.UrlService.DeleteById(id)
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			ctx.JSON(http.StatusNotFound, err)
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}

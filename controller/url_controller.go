@@ -7,7 +7,6 @@ type UrlController interface {
 	FindByIdAndRedirect(c *gin.Context)
 	FindAll(c *gin.Context)
 	FindById(c *gin.Context)
-	FindByUserId(c *gin.Context)
 	Create(c *gin.Context)
 	DeleteById(c *gin.Context)
 }

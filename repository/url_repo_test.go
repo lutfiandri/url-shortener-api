@@ -23,7 +23,7 @@ var database *gorm.DB
 var url entity.Url = entity.Url{
 	Id:      shortuuid.New(),
 	LongUrl: "https://google.com",
-	UserId:  shortuuid.New(),
+	Title:   "Google",
 }
 
 func TestMain(m *testing.M) {
@@ -45,17 +45,17 @@ func TestFindAll(t *testing.T) {
 		{
 			Id:      shortuuid.New(),
 			LongUrl: "https://google.com",
-			UserId:  shortuuid.New(),
+			Title:   "Google",
 		},
 		{
 			Id:      shortuuid.New(),
 			LongUrl: "https://facebook.com",
-			UserId:  shortuuid.New(),
+			Title:   "Facebook",
 		},
 		{
 			Id:      shortuuid.New(),
 			LongUrl: "https://manjaro.org",
-			UserId:  shortuuid.New(),
+			Title:   "Manjaro",
 		},
 	}
 
@@ -93,46 +93,6 @@ func TestFindById_Negative(t *testing.T) {
 
 	assert.Error(t, err)
 	assert.Empty(t, result)
-}
-
-func TestFindByUserId(t *testing.T) {
-	urlRepository := repository.NewUrlRepository(database)
-
-	urls := []entity.Url{
-		{
-			Id:      shortuuid.New(),
-			LongUrl: "https://google.com",
-			UserId:  "EAsgVGodDaX32nQScND35a",
-		},
-		{
-			Id:      shortuuid.New(),
-			LongUrl: "https://facebook.com",
-			UserId:  "EAsgVGodDaX32nQScND35a",
-		},
-		{
-			Id:      shortuuid.New(),
-			LongUrl: "https://manjaro.org",
-			UserId:  "JLrQVwVRYGXJhZQX7VbXCT",
-		},
-		{
-			Id:      shortuuid.New(),
-			LongUrl: "https://ubuntu.com",
-			UserId:  "",
-		},
-	}
-
-	for _, url := range urls {
-		database.Create(&url)
-	}
-
-	results, err := urlRepository.FindByUserId("EAsgVGodDaX32nQScND35a")
-
-	assert.NoError(t, err)
-	assert.ElementsMatch(t, urls[0:2], results)
-
-	for _, url := range urls {
-		database.Delete(&url)
-	}
 }
 
 func TestCreate(t *testing.T) {
