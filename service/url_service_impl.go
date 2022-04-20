@@ -15,12 +15,27 @@ func NewUrlService(urlRepository repository.UrlRepository) UrlService {
 	}
 }
 
-func (s *urlService) Create(url entity.Url) error {
-	err := s.UrlRepository.Create(url)
-	return err
+func (s *urlService) FindAll() ([]entity.Url, error) {
+	urls, err := s.UrlRepository.FindAll()
+	return urls, err
 }
 
 func (s *urlService) FindById(id string) (entity.Url, error) {
 	url, err := s.UrlRepository.FindById(id)
 	return url, err
+}
+
+func (s *urlService) FindByUserId(userId string) ([]entity.Url, error) {
+	urls, err := s.UrlRepository.FindByUserId(userId)
+	return urls, err
+}
+
+func (s *urlService) Create(url entity.Url) error {
+	err := s.UrlRepository.Create(url)
+	return err
+}
+
+func (s *urlService) DeleteById(id string) error {
+	err := s.UrlRepository.DeleteById(id)
+	return err
 }

@@ -5,6 +5,9 @@ import (
 )
 
 type UrlService interface {
-	Create(url entity.Url) error
+	FindAll() ([]entity.Url, error)
 	FindById(id string) (entity.Url, error)
+	FindByUserId(userId string) ([]entity.Url, error)
+	Create(url entity.Url) error
+	DeleteById(id string) error
 }

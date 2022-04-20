@@ -10,3 +10,5 @@ type UrlResponse struct {
 	LongUrl  string `json:"long_url"`
 	UserId   string `json:"user_id"`
 }
+
+type ManyUrlResponse []UrlResponse
