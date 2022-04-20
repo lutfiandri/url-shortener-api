@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	env := config.GetEnv()
+
 	database := config.NewSqliteDatabase(".data/url-shortener.db")
 	urlRepository := repository.NewUrlRepository(database)
 	urlService := service.NewUrlService(urlRepository)
@@ -17,5 +19,6 @@ func main() {
 
 	r := gin.Default()
 	urlController.Route(r)
-	r.Run(":8080")
+
+	r.Run(":" + env.Port)
 }

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"fmt"
+
 	"url-shortener-api/entity"
 
 	"gorm.io/gorm"
@@ -29,7 +31,7 @@ func (r *urlRepository) FindById(id string) (entity.Url, error) {
 	return url, err
 }
 
-func (r *urlRepository) FindByUser(userId string) ([]entity.Url, error) {
+func (r *urlRepository) FindByUserId(userId string) ([]entity.Url, error) {
 	var urls []entity.Url
 	err := r.db.Find(&urls, "user_id = ?", userId).Error
 	return urls, err
@@ -41,8 +43,14 @@ func (r *urlRepository) Create(url entity.Url) error {
 }
 
 func (r *urlRepository) DeleteById(id string) error {
-	err := r.db.Delete(entity.Url{}, "id = ?", id).Error
-	return err
+	res := r.db.Delete(entity.Url{}, "id = ?", id)
+
+	if res.Error != nil {
+		return res.Error
+	} else if res.RowsAffected < 1 {
+		return fmt.Errorf("rl with id %v does not exist", id)
+	}
+	return nil
 }
 
 // func (r *urlRepository) AutoMigrate() {

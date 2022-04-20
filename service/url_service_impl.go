@@ -2,7 +2,6 @@ package service
 
 import (
 	"url-shortener-api/entity"
-	"url-shortener-api/exception"
 	"url-shortener-api/repository"
 )
 
@@ -16,15 +15,12 @@ func NewUrlService(urlRepository repository.UrlRepository) UrlService {
 	}
 }
 
-func (s *urlService) Create(url entity.Url) string {
+func (s *urlService) Create(url entity.Url) error {
 	err := s.UrlRepository.Create(url)
-	exception.PanicIfNeeded(err)
-	shortUrl := "http://localhost:8080/" + url.Id
-	return shortUrl
+	return err
 }
 
-func (s *urlService) FindById(id string) string {
+func (s *urlService) FindById(id string) (entity.Url, error) {
 	url, err := s.UrlRepository.FindById(id)
-	exception.PanicIfNeeded(err)
-	return url.LongUrl
+	return url, err
 }
