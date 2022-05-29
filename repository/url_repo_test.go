@@ -41,6 +41,7 @@ func TestMain(m *testing.M) {
 func TestFindAll(t *testing.T) {
 	urlRepository := repository.NewUrlRepository(database)
 
+	// DataPoint
 	urls := []entity.Url{
 		{
 			Id:      shortuuid.New(),
@@ -59,18 +60,23 @@ func TestFindAll(t *testing.T) {
 		},
 	}
 
+	// Insert to DB
 	for _, url := range urls {
 		database.Create(&url)
 	}
 
+	// Remove from DB at the end
+	defer func() {
+		for _, url := range urls {
+			database.Delete(&url)
+		}
+	}()
+
+	// Test the testcases
 	results, err := urlRepository.FindAll()
 
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, urls, results)
-
-	for _, url := range urls {
-		database.Delete(&url)
-	}
 }
 
 func TestFindById_Positive(t *testing.T) {
