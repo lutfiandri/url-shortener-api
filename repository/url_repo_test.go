@@ -20,12 +20,6 @@ const (
 
 var database *gorm.DB
 
-var url entity.Url = entity.Url{
-	Id:      shortuuid.New(),
-	LongUrl: "https://google.com",
-	Title:   "Google",
-}
-
 func TestMain(m *testing.M) {
 	// before
 	os.Mkdir(tmpLocation, os.ModePerm)
@@ -82,57 +76,452 @@ func TestFindAll(t *testing.T) {
 func TestFindById_Positive(t *testing.T) {
 	urlRepository := repository.NewUrlRepository(database)
 
-	database.Create(&url)
+	// tests table (@datapoint)
+	tests := []struct {
+		name     string
+		inputId  string
+		expected entity.Url
+		urls     []entity.Url
+	}{
+		{
+			name:    "TestFindById_Positive-001",
+			inputId: "id002",
+			expected: entity.Url{
+				Id:      "id002",
+				LongUrl: "https://facebook.com",
+				Title:   "Facebook",
+			},
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+				{
+					Id:      "id003",
+					LongUrl: "https://manjaro.org",
+					Title:   "Manjaro",
+				},
+			},
+		},
+		{
+			name:    "TestFindById_Positive-002",
+			inputId: "id002",
+			expected: entity.Url{
+				Id:      "id002",
+				LongUrl: "https://facebook.com",
+				Title:   "Facebook",
+			},
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+			},
+		},
+	}
 
-	result, err := urlRepository.FindById(url.Id)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// setup data in db (using gorm)
+			for _, url := range test.urls {
+				database.Create(&url)
+			}
 
-	assert.NoError(t, err)
-	assert.Equal(t, url, result)
+			// delete data after usage in db (using gorm)
+			defer func() {
+				for _, url := range test.urls {
+					database.Delete(&url)
+				}
+			}()
 
-	database.Delete(&url)
+			// test (@test)
+			actual, err := urlRepository.FindById(test.inputId)
+			assert.NoErrorf(t, err, "error on %s", test.name)
+			assert.Equalf(t, test.expected, actual, "not equal on %s", test.name)
+		})
+	}
 }
 
 func TestFindById_Negative(t *testing.T) {
 	urlRepository := repository.NewUrlRepository(database)
 
-	result, err := urlRepository.FindById(url.Id)
+	// tests table (@datapoint)
+	tests := []struct {
+		name    string
+		inputId string
+		urls    []entity.Url
+	}{
+		{
+			name:    "TestFindById_Negative-001",
+			inputId: "id004",
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+				{
+					Id:      "id003",
+					LongUrl: "https://manjaro.org",
+					Title:   "Manjaro",
+				},
+			},
+		},
+		{
+			name:    "TestFindById_Negative-002",
+			inputId: "id005",
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+			},
+		},
+	}
 
-	assert.Error(t, err)
-	assert.Empty(t, result)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// setup data in db (using gorm)
+			for _, url := range test.urls {
+				database.Create(&url)
+			}
+
+			// delete data after usage in db (using gorm)
+			defer func() {
+				for _, url := range test.urls {
+					database.Delete(&url)
+				}
+			}()
+
+			// test (@test)
+			actual, err := urlRepository.FindById(test.inputId)
+			assert.Errorf(t, err, "not error on %s", test.name)
+			assert.Emptyf(t, actual, "not empty on %s", test.name)
+		})
+	}
 }
 
-func TestCreate(t *testing.T) {
+func TestCreate_Positive(t *testing.T) {
 	urlRepository := repository.NewUrlRepository(database)
 
-	err := urlRepository.Create(url)
+	// tests table (@datapoint)
+	tests := []struct {
+		name     string
+		inputUrl entity.Url
+		urls     []entity.Url
+	}{
+		{
+			name: "TestCreate_Positive-001",
+			inputUrl: entity.Url{
+				Id:      "id005",
+				LongUrl: "https://google.com",
+				Title:   "Google",
+			},
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+				{
+					Id:      "id003",
+					LongUrl: "https://manjaro.org",
+					Title:   "Manjaro",
+				},
+			},
+		},
+		{
+			name: "TestCreate_Positive-002",
+			inputUrl: entity.Url{
+				Id:      "id006",
+				LongUrl: "https://something2.com",
+				Title:   "something2",
+			},
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+			},
+		},
+	}
 
-	var result entity.Url
-	database.First(&result, "id = ?", url.Id)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// setup data in db (using gorm)
+			for _, url := range test.urls {
+				database.Create(&url)
+			}
 
-	assert.NoError(t, err)
-	assert.Equal(t, url, result)
+			// delete data after usage in db (using gorm)
+			defer func() {
+				for _, url := range test.urls {
+					database.Delete(&url)
+				}
+			}()
 
-	database.Delete(&url)
+			// test (@test)
+			err := urlRepository.Create(test.inputUrl)
+			assert.NoErrorf(t, err, "error on %s", test.name)
+
+			// verify the data is inserted
+			var result entity.Url
+			database.First(&result, "id = ?", test.inputUrl.Id)
+			assert.NotEmptyf(t, result, "empty on %s", test.name)
+		})
+	}
+}
+
+func TestCreate_Negative(t *testing.T) {
+	urlRepository := repository.NewUrlRepository(database)
+
+	// tests table (@datapoint)
+	tests := []struct {
+		name     string
+		inputUrl entity.Url
+		urls     []entity.Url
+	}{
+		{
+			name: "TestCreate_Negative-001",
+			inputUrl: entity.Url{
+				Id:      "id002",
+				LongUrl: "https://google.com",
+				Title:   "Google",
+			},
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+				{
+					Id:      "id003",
+					LongUrl: "https://manjaro.org",
+					Title:   "Manjaro",
+				},
+			},
+		},
+		{
+			name: "TestCreate_Negative-002",
+			inputUrl: entity.Url{
+				Id:      "id001",
+				LongUrl: "https://something2.com",
+				Title:   "something2",
+			},
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// setup data in db (using gorm)
+			for _, url := range test.urls {
+				database.Create(&url)
+			}
+
+			// delete data after usage in db (using gorm)
+			defer func() {
+				for _, url := range test.urls {
+					database.Delete(&url)
+				}
+			}()
+
+			// test (@test)
+			err := urlRepository.Create(test.inputUrl)
+			assert.Errorf(t, err, "error on %s", test.name)
+		})
+	}
 }
 
 func TestDeleteById_Positive(t *testing.T) {
 	urlRepository := repository.NewUrlRepository(database)
 
-	database.Create(&url)
+	// tests table (@datapoint)
+	tests := []struct {
+		name    string
+		inputId string
+		urls    []entity.Url
+	}{
+		{
+			name:    "TestDeleteById_Positive-001",
+			inputId: "id002",
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+				{
+					Id:      "id003",
+					LongUrl: "https://manjaro.org",
+					Title:   "Manjaro",
+				},
+			},
+		},
+		{
+			name:    "TestDeleteById_Positive-002",
+			inputId: "id002",
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+			},
+		},
+	}
 
-	err := urlRepository.DeleteById(url.Id)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// setup data in db (using gorm)
+			for _, url := range test.urls {
+				database.Create(&url)
+			}
 
-	var result entity.Url
-	database.First(&result, "id = ?", url.Id)
+			// delete data after usage in db (using gorm)
+			defer func() {
+				for _, url := range test.urls {
+					database.Delete(&url)
+				}
+			}()
 
-	assert.NoError(t, err)
-	assert.Empty(t, result)
+			// test (@test)
+			err := urlRepository.DeleteById(test.inputId)
+			assert.NoErrorf(t, err, "error on %s", test.name)
+
+			// verify the data is deleted
+			var result entity.Url
+			database.First(&result, "id = ?", url.Id)
+			assert.Emptyf(t, result, "not empty on %s", test.name)
+		})
+	}
 }
 
 func TestDeleteById_Negative(t *testing.T) {
 	urlRepository := repository.NewUrlRepository(database)
 
-	err := urlRepository.DeleteById(url.Id)
+	// tests table (@datapoint)
+	tests := []struct {
+		name    string
+		inputId string
+		urls    []entity.Url
+	}{
+		{
+			name:    "TestDeleteById_Positive-001",
+			inputId: "id010",
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+				{
+					Id:      "id003",
+					LongUrl: "https://manjaro.org",
+					Title:   "Manjaro",
+				},
+			},
+		},
+		{
+			name:    "TestDeleteById_Positive-002",
+			inputId: "id010",
+			urls: []entity.Url{
+				{
+					Id:      "id001",
+					LongUrl: "https://google.com",
+					Title:   "Google",
+				},
+				{
+					Id:      "id002",
+					LongUrl: "https://facebook.com",
+					Title:   "Facebook",
+				},
+			},
+		},
+	}
 
-	assert.Error(t, err)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// setup data in db (using gorm)
+			for _, url := range test.urls {
+				database.Create(&url)
+			}
+
+			// delete data after usage in db (using gorm)
+			defer func() {
+				for _, url := range test.urls {
+					database.Delete(&url)
+				}
+			}()
+
+			// test (@test)
+			err := urlRepository.DeleteById(test.inputId)
+			assert.Errorf(t, err, "not error on %s", test.name)
+		})
+	}
 }
