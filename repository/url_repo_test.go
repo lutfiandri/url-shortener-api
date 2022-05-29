@@ -451,7 +451,7 @@ func TestDeleteById_Positive(t *testing.T) {
 
 			// verify the data is deleted
 			var result entity.Url
-			database.First(&result, "id = ?", url.Id)
+			database.First(&result, "id = ?", result.Id)
 			assert.Emptyf(t, result, "not empty on %s", test.name)
 		})
 	}
